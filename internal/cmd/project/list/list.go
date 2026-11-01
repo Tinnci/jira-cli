@@ -1,6 +1,9 @@
 package list
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/ankitpokhrel/jira-cli/api"
@@ -11,19 +14,35 @@ import (
 
 // NewCmdList is a list command.
 func NewCmdList() *cobra.Command {
-	return &cobra.Command{
+	cmd := cobra.Command{
 		Use:     "list",
 		Short:   "List lists Jira projects",
 		Long:    "List lists Jira projects that a user has access to.",
 		Aliases: []string{"lists", "ls"},
 		Run:     List,
 	}
+	cmd.Flags().Bool("raw", false, "Print the projects as JSON")
+	return &cmd
 }
 
 // List displays a list view.
 func List(cmd *cobra.Command, _ []string) {
 	debug, err := cmd.Flags().GetBool("debug")
 	cmdutil.ExitIfError(err)
+	raw, err := cmd.Flags().GetBool("raw")
+	cmdutil.ExitIfError(err)
+
+	if raw {
+		projects, err := api.DefaultClient(debug).Project()
+		cmdutil.ExitIfError(err)
+		if projects == nil {
+			projects = []*jira.Project{}
+		}
+		out, err := json.Marshal(projects)
+		cmdutil.ExitIfError(err)
+		fmt.Println(string(out))
+		return
+	}
 
 	projects, total, err := func() ([]*jira.Project, int, error) {
 		s := cmdutil.Info("Fetching projects...")
