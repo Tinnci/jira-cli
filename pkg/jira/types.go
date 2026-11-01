@@ -46,6 +46,7 @@ type ProjectVersion struct {
 	Name        string      `json:"name"`
 	ProjectID   int         `json:"projectId"`
 	Released    bool        `json:"released"`
+	ReleaseDate string      `json:"releaseDate,omitempty"`
 }
 
 // Board holds board info.

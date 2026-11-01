@@ -7,10 +7,29 @@ import (
 	"net/http"
 )
 
-// Release fetches response from /project/{projectIdOrKey}/version endpoint.
+// Release fetches response from v3 /project/{projectIdOrKey}/versions endpoint.
 func (c *Client) Release(project string) ([]*ProjectVersion, error) {
+	return c.release(project, apiVersion3)
+}
+
+// ReleaseV2 fetches response from v2 /project/{projectIdOrKey}/versions endpoint.
+// Jira Server and Data Center serve only v2.
+func (c *Client) ReleaseV2(project string) ([]*ProjectVersion, error) {
+	return c.release(project, apiVersion2)
+}
+
+func (c *Client) release(project, ver string) ([]*ProjectVersion, error) {
 	path := fmt.Sprintf("/project/%s/versions", project)
-	res, err := c.Get(context.Background(), path, nil)
+
+	var (
+		res *http.Response
+		err error
+	)
+	if ver == apiVersion2 {
+		res, err = c.GetV2(context.Background(), path, nil)
+	} else {
+		res, err = c.Get(context.Background(), path, nil)
+	}
 	if err != nil {
 		return nil, err
 	}

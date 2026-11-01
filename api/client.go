@@ -151,6 +151,15 @@ func ProxySearch(c *jira.Client, jql string, from, limit uint) (*jira.SearchResu
 	return issues, err
 }
 
+// ProxyRelease uses either a v2 or v3 version of the Jira GET /project/{key}/versions
+// endpoint based on configured installation type. Defaults to v3.
+func ProxyRelease(c *jira.Client, project string) ([]*jira.ProjectVersion, error) {
+	if viper.GetString("installation") == jira.InstallationTypeLocal {
+		return c.ReleaseV2(project)
+	}
+	return c.Release(project)
+}
+
 // ProxyAssignIssue uses either a v2 or v3 version of the PUT /issue/{key}/assignee
 // endpoint to assign an issue to the user.
 // Defaults to v3 if installation type is not defined in the config.

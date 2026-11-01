@@ -6,12 +6,14 @@ import (
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/assign"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/clone"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/comment"
+	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/count"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/create"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/delete"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/edit"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/link"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/list"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/move"
+	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/query"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/unlink"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/view"
 	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/watch"
@@ -38,6 +40,7 @@ func NewCmdIssue() *cobra.Command {
 		lc, cc, edit.NewCmdEdit(), move.NewCmdMove(), view.NewCmdView(), assign.NewCmdAssign(),
 		link.NewCmdLink(), unlink.NewCmdUnlink(), comment.NewCmdComment(), clone.NewCmdClone(),
 		delete.NewCmdDelete(), watch.NewCmdWatch(), worklog.NewCmdWorklog(),
+		query.NewCmdQuery(), count.NewCmdCount(),
 	)
 
 	list.SetFlags(lc)
