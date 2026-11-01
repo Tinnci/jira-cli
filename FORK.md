@@ -12,6 +12,8 @@ which keeps the token.
 - `jira issue query --jql Q [--fields a,b] [--from N] [--limit N]`: the v2 `/search`
   response unchanged, with `total` and custom fields. `issue list --raw` drops fields that
   jira-cli's own types do not model, such as a severity custom field.
+  `--no-validate` sends `validateQuery=false`, so a `key in (…)` batch leaves out keys
+  that do not exist or that the account cannot browse instead of failing as a whole.
 - `jira issue count --jql Q [--jql Q2 …]`: `[{"jql","total"}]` without reading issues.
 
 Measured against PLV on 2026-11-01: 47 versions in 0.09 s, two counts in 0.1 s, and 1000

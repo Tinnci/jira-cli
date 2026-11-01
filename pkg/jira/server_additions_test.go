@@ -80,3 +80,15 @@ func TestSearchRawV2ReportsUnexpectedStatus(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "does not exist")
 }
+
+func TestSearchRawV2OptsCanSkipValidation(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "false", r.URL.Query().Get("validateQuery"))
+		_, _ = w.Write([]byte(`{"total":1,"issues":[{"key":"PLV-1"}]}`))
+	}))
+	defer server.Close()
+
+	client := NewClient(Config{Server: server.URL}, WithTimeout(3*time.Second))
+	_, err := client.SearchRawV2Opts("key in (PLV-1, PLV-999999)", 0, 10, "*all", false)
+	assert.NoError(t, err)
+}

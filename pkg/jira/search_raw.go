@@ -13,9 +13,19 @@ import (
 // every requested field (custom fields too). fields is a comma-separated list or empty
 // for Jira's default navigable fields.
 func (c *Client) SearchRawV2(jql string, from, limit uint, fields string) ([]byte, error) {
+	return c.SearchRawV2Opts(jql, from, limit, fields, true)
+}
+
+// SearchRawV2Opts is SearchRawV2 with Jira's query validation switchable. Without
+// validation, keys that do not exist or that the user cannot browse are left out of the
+// result instead of failing the whole query (validateQuery=false).
+func (c *Client) SearchRawV2Opts(jql string, from, limit uint, fields string, validate bool) ([]byte, error) {
 	path := fmt.Sprintf("/search?jql=%s&startAt=%d&maxResults=%d", url.QueryEscape(jql), from, limit)
 	if fields != "" {
 		path += "&fields=" + url.QueryEscape(fields)
+	}
+	if !validate {
+		path += "&validateQuery=false"
 	}
 	res, err := c.GetV2(context.Background(), path, nil)
 	if err != nil {

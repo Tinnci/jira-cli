@@ -28,6 +28,7 @@ not added to it.`,
 	cmd.Flags().Uint("from", 0, "Index of the first issue")
 	cmd.Flags().Uint("limit", 100, "Issues per call, at most 1000 (Jira may cap it lower)")
 	cmd.Flags().String("fields", "", "Comma-separated fields; empty for Jira's default navigable fields")
+	cmd.Flags().Bool("no-validate", false, "Leave out unknown or hidden issue keys instead of failing (validateQuery=false)")
 	return &cmd
 }
 
@@ -38,6 +39,7 @@ func query(cmd *cobra.Command, _ []string) {
 	from, _ := cmd.Flags().GetUint("from")
 	limit, _ := cmd.Flags().GetUint("limit")
 	fields, _ := cmd.Flags().GetString("fields")
+	noValidate, _ := cmd.Flags().GetBool("no-validate")
 	if jql == "" {
 		cmdutil.Failed("--jql is required")
 		os.Exit(1)
@@ -45,7 +47,7 @@ func query(cmd *cobra.Command, _ []string) {
 	if limit > maxLimit {
 		limit = maxLimit
 	}
-	body, err := api.DefaultClient(debug).SearchRawV2(jql, from, limit, fields)
+	body, err := api.DefaultClient(debug).SearchRawV2Opts(jql, from, limit, fields, !noValidate)
 	cmdutil.ExitIfError(err)
 	fmt.Println(string(body))
 }
