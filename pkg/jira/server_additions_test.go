@@ -89,6 +89,18 @@ func TestSearchRawV2OptsCanSkipValidation(t *testing.T) {
 	defer server.Close()
 
 	client := NewClient(Config{Server: server.URL}, WithTimeout(3*time.Second))
-	_, err := client.SearchRawV2Opts("key in (PLV-1, PLV-999999)", 0, 10, "*all", false)
+	_, err := client.SearchRawV2Opts("key in (PLV-1, PLV-999999)", 0, 10, "*all", false, "")
+	assert.NoError(t, err)
+}
+
+func TestSearchRawV2OptsPassesExpand(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "changelog", r.URL.Query().Get("expand"))
+		_, _ = w.Write([]byte(`{"total":0,"issues":[]}`))
+	}))
+	defer server.Close()
+
+	client := NewClient(Config{Server: server.URL}, WithTimeout(3*time.Second))
+	_, err := client.SearchRawV2Opts("project = PLV", 0, 10, "status", true, "changelog")
 	assert.NoError(t, err)
 }
