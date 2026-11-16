@@ -29,8 +29,6 @@ linters:
       rules:
         - name: package-comments
           disabled: true
-    testpackage:
-      skip-regexp: .*
   exclusions:
     generated: lax
     paths:
