@@ -235,3 +235,19 @@ func TestCFAccessRoundTripper(t *testing.T) {
 
 	_ = resp.Body.Close()
 }
+
+func TestRedactRequestForDump(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://jira.example.com/rest/api/2/myself", nil)
+	req.Header.Set("Authorization", "Bearer super-secret-token")
+	req.Header.Set("Cookie", "JSESSIONID=secret-session")
+	req.Header.Set("X-Request-Id", "req-123")
+
+	redacted := redactRequestForDump(req)
+
+	assert.Equal(t, "[REDACTED]", redacted.Header.Get("Authorization"))
+	assert.Equal(t, "[REDACTED]", redacted.Header.Get("Cookie"))
+	assert.Equal(t, "req-123", redacted.Header.Get("X-Request-Id"))
+	// Original request headers must remain intact for actual transport.
+	assert.Equal(t, "Bearer super-secret-token", req.Header.Get("Authorization"))
+	assert.Equal(t, "JSESSIONID=secret-session", req.Header.Get("Cookie"))
+}

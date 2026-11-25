@@ -329,8 +329,18 @@ func (c *Client) request(ctx context.Context, method, endpoint string, body []by
 	return httpClient.Do(req.WithContext(ctx))
 }
 
+func redactRequestForDump(req *http.Request) *http.Request {
+	cloned := req.Clone(req.Context())
+	for _, header := range []string{"Authorization", "Cookie", "Proxy-Authorization"} {
+		if len(cloned.Header.Values(header)) > 0 {
+			cloned.Header.Set(header, "[REDACTED]")
+		}
+	}
+	return cloned
+}
+
 func dump(req *http.Request, res *http.Response) {
-	reqDump, _ := httputil.DumpRequest(req, true)
+	reqDump, _ := httputil.DumpRequest(redactRequestForDump(req), true)
 	prettyPrintDump("Request Details", reqDump)
 
 	if res != nil {
