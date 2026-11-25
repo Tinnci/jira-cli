@@ -63,3 +63,11 @@ jobs:
           } else {
             gh release create $tag release-assets/* --repo $env:PUBLIC_RELEASE_REPO --title "jira-cli ${{ github.ref_name }}" --notes "Binary-only redistributable for jira-cli ${{ github.ref_name }}."
           }
+          if (Test-Path release-assets/jira-cli-latest.json) {
+            gh release view jira-cli-latest --repo $env:PUBLIC_RELEASE_REPO 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+              gh release upload jira-cli-latest release-assets/jira-cli-latest.json --repo $env:PUBLIC_RELEASE_REPO --clobber
+            } else {
+              gh release create jira-cli-latest release-assets/jira-cli-latest.json --repo $env:PUBLIC_RELEASE_REPO --title "jira-cli Latest Feed" --notes "Rolling latest update manifest for jira-cli."
+            }
+          }
